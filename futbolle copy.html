@@ -1,0 +1,3177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090c0f">
+
+  <title>FUTBOLLE — Adiviná al jugador</title>
+
+  <link rel="stylesheet" href="futbolle.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="site-header">
+
+    <div class="logo">
+      FUTBOL<span>LE</span>
+    </div>
+
+    <div class="header-actions">
+      <button
+        class="icon-button"
+        id="helpBtn"
+        aria-label="Cómo jugar"
+        type="button"
+      >
+        ?
+      </button>
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="hero">
+
+      <h1>
+        El Wordle de los jugadores del fútbol argentino
+      </h1>
+
+      <p id="modeDescription">
+        Cargando jugadores...
+      </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         MODOS
+         ===================================================== -->
+
+    <nav
+      class="mode-switch"
+      aria-label="Modo de juego"
+    >
+
+      <button
+        class="mode-button active"
+        data-mode="classic"
+        type="button"
+      >
+        CLÁSICO
+      </button>
+
+      <button
+        class="mode-button"
+        data-mode="who"
+        type="button"
+      >
+        ¿QUIÉN ES?
+      </button>
+
+    </nav>
+
+
+    <!-- =====================================================
+         ESTADÍSTICAS
+         ===================================================== -->
+
+    <div class="status">
+
+      <span>
+        Racha:
+        <strong id="streak">0</strong>
+      </span>
+
+      <span>
+        Partidas:
+        <strong id="played">0</strong>
+      </span>
+
+      <span>
+        Victorias:
+        <strong id="wins">0%</strong>
+      </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         MENSAJES
+         ===================================================== -->
+
+    <div
+      id="message"
+      class="message"
+      aria-live="polite"
+    ></div>
+
+
+    <!-- =====================================================
+         MODO CLÁSICO
+         ===================================================== -->
+
+    <section id="classicMode">
+
+      <div
+        id="classicBoard"
+        class="classic-board"
+      ></div>
+
+
+      <div class="guess-area">
+
+        <input
+          id="classicInput"
+          class="guess-input"
+          type="text"
+          maxlength="5"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="Escribí el apellido..."
+          disabled
+        >
+
+        <div
+          id="classicSuggestions"
+          class="suggestions"
+        ></div>
+
+      </div>
+
+
+      <div
+        id="classicKeyboard"
+        class="keyboard"
+      ></div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MODO ¿QUIÉN ES?
+         ===================================================== -->
+
+    <section
+      id="whoMode"
+      class="who-panel hidden"
+    >
+
+      <div class="who-intro">
+
+        <strong>Encontrá al jugador.</strong>
+
+        Escribí nombres de jugadores.
+        Después de cada intento,
+        las pistas te van a acercar a la respuesta.
+
+      </div>
+
+
+      <div class="hints-head">
+
+        <span>Jugador</span>
+        <span>Club</span>
+        <span>Posición</span>
+        <span>Nac.</span>
+        <span>Edad</span>
+        <span>Pie</span>
+
+      </div>
+
+
+      <div id="whoRows"></div>
+
+
+      <div class="guess-area">
+
+        <input
+          id="whoInput"
+          class="guess-input"
+          type="text"
+          maxlength="50"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="words"
+          spellcheck="false"
+          placeholder="Escribí el jugador..."
+          disabled
+        >
+
+        <div
+          id="whoSuggestions"
+          class="suggestions"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ACCIONES
+         ===================================================== -->
+
+    <div class="actions">
+
+      <button
+        id="newGameBtn"
+        class="action-button"
+        type="button"
+      >
+        ↻ Nueva partida
+      </button>
+
+      <button
+        id="shareBtn"
+        class="action-button primary"
+        type="button"
+      >
+        ▣ Compartir
+      </button>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL RESULTADO
+     ========================================================= -->
+
+<div
+  id="resultModal"
+  class="modal"
+>
+
+  <div class="modal-card">
+
+    <h2 id="resultTitle">
+      ¡Golazo!
+    </h2>
+
+    <div
+      id="resultSubtitle"
+      class="modal-subtitle"
+    ></div>
+
+    <div
+      id="resultAnswer"
+      class="answer"
+    ></div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        <strong id="resultAttempts">-</strong>
+        <span>INTENTOS</span>
+      </div>
+
+      <div class="stat">
+        <strong id="resultPlayed">0</strong>
+        <span>PARTIDAS</span>
+      </div>
+
+      <div class="stat">
+        <strong id="resultWinRate">0%</strong>
+        <span>VICTORIAS</span>
+      </div>
+
+    </div>
+
+
+    <button
+      id="closeResult"
+      class="modal-close"
+      type="button"
+    >
+      Seguir jugando
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL AYUDA
+     ========================================================= -->
+
+<div
+  id="helpModal"
+  class="modal"
+>
+
+  <div class="modal-card">
+
+    <h2>Cómo jugar</h2>
+
+    <div class="modal-subtitle">
+      Dos juegos dentro de FUTBOLLE
+    </div>
+
+
+    <ul class="help-list">
+
+      <li>
+        <strong>CLÁSICO:</strong>
+        adiviná el apellido del jugador en 6 intentos.
+      </li>
+
+      <li>
+        <strong>¿QUIÉN ES?:</strong>
+        elegí un jugador y usá las pistas
+        para descubrir al objetivo.
+      </li>
+
+      <li>
+        <strong>🟩 Verde:</strong>
+        dato correcto.
+      </li>
+
+      <li>
+        <strong>🟨 Amarillo:</strong>
+        dato cercano.
+      </li>
+
+      <li>
+        <strong>⬛ Gris:</strong>
+        dato incorrecto o no disponible.
+      </li>
+
+    </ul>
+
+
+    <div class="example">
+
+      <span class="g">R</span>
+      <span class="y">I</span>
+      <span class="r">V</span>
+      <span class="r">E</span>
+      <span class="r">R</span>
+
+    </div>
+
+
+    <button
+      id="closeHelp"
+      class="modal-close"
+      type="button"
+    >
+      Entendido
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================================
+   FUTBOLLE
+   BASE DE DATOS
+   ==========================================================
+
+   IMPORTANTE:
+
+   Los jugadores NO están escritos acá.
+
+   Se cargan desde:
+
+       data/players.json
+
+   Estructura esperada:
+
+   {
+     "name": "Adam Bareiro",
+     "age": 30,
+     "birth_date": "1996-07-26",
+     "height_cm": 180,
+     "position": "FW",
+     "position_detail": "ST",
+     "position_label": "Centro Delantero",
+     "team": {
+       "name": "Boca Jrs.",
+       "slug": "boca-juniors",
+       "code": "igg",
+       "url": "..."
+     }
+   }
+
+   ========================================================== */
+
+
+/* ==========================================================
+   VARIABLES GLOBALES
+   ========================================================== */
+
+let PLAYERS = [];
+
+let CLASSIC_PLAYERS = [];
+
+let mode = "classic";
+
+let classicAnswer = null;
+let classicGuesses = [];
+let classicOver = false;
+
+let whoAnswer = null;
+let whoGuesses = [];
+let whoOver = false;
+
+let stats = loadStats();
+
+
+/* ==========================================================
+   ELEMENTOS DOM
+   ========================================================== */
+
+const classicBoard =
+  document.getElementById("classicBoard");
+
+const classicInput =
+  document.getElementById("classicInput");
+
+const classicSuggestions =
+  document.getElementById("classicSuggestions");
+
+const whoInput =
+  document.getElementById("whoInput");
+
+const whoSuggestions =
+  document.getElementById("whoSuggestions");
+
+const whoRows =
+  document.getElementById("whoRows");
+
+
+/* ==========================================================
+   NORMALIZAR TEXTO
+   ========================================================== */
+
+function normalize(value) {
+
+  return String(value ?? "")
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/Ñ/g, "N")
+    .replace(/[^A-Z0-9 ]/g, "")
+    .trim();
+
+}
+
+
+/* ==========================================================
+   NORMALIZAR JUGADOR DEL JSON
+   ========================================================== */
+
+function normalizePlayer(raw, index) {
+
+  const ageNumber =
+    raw.age !== null &&
+    raw.age !== undefined &&
+    raw.age !== "" &&
+    !isNaN(Number(raw.age))
+      ? Number(raw.age)
+      : null;
+
+
+  const heightNumber =
+    raw.height_cm !== null &&
+    raw.height_cm !== undefined &&
+    raw.height_cm !== "" &&
+    !isNaN(Number(raw.height_cm))
+      ? Number(raw.height_cm)
+      : null;
+
+
+  return {
+
+    /*
+     * ID interno.
+     *
+     * El JSON que generaste no necesita tener ID.
+     */
+    id: index + 1,
+
+
+    /*
+     * Nombre real proveniente del JSON.
+     */
+    name:
+      typeof raw.name === "string"
+        ? raw.name.trim()
+        : "Jugador sin nombre",
+
+
+    /*
+     * Edad.
+     */
+    age: ageNumber,
+
+
+    /*
+     * Fecha de nacimiento.
+     */
+    birth_date:
+      raw.birth_date || null,
+
+
+    /*
+     * Altura.
+     */
+    height: heightNumber,
+
+
+    /*
+     * Posición mostrada.
+     *
+     * Preferimos:
+     *
+     * Centro Delantero
+     *
+     * antes que:
+     *
+     * ST
+     */
+    position:
+      raw.position_label ||
+      raw.position_detail ||
+      raw.position ||
+      "—",
+
+
+    /*
+     * Código de posición.
+     *
+     * FW / MF / DF / GK
+     */
+    position_code:
+      raw.position || null,
+
+
+    /*
+     * Posición detallada.
+     *
+     * ST / CM / CB / etc.
+     */
+    position_detail:
+      raw.position_detail || null,
+
+
+    /*
+     * ACÁ ESTÁ LA CORRECCIÓN IMPORTANTE.
+     *
+     * raw.team es un OBJETO.
+     *
+     * NO hacemos:
+     *
+     * club: raw.team
+     *
+     * porque eso genera:
+     *
+     * [object Object]
+     *
+     * Hacemos:
+     *
+     * club: raw.team.name
+     */
+    club:
+      raw.team &&
+      typeof raw.team === "object"
+        ? raw.team.name || "—"
+        : "—",
+
+
+    /*
+     * Datos adicionales del club.
+     */
+    club_slug:
+      raw.team &&
+      typeof raw.team === "object"
+        ? raw.team.slug || null
+        : null,
+
+
+    club_code:
+      raw.team &&
+      typeof raw.team === "object"
+        ? raw.team.code || null
+        : null,
+
+
+    /*
+     * Nacionalidad.
+     *
+     * Si el JSON no la tiene,
+     * queda null.
+     *
+     * NO inventamos Argentina.
+     */
+    nationality:
+      typeof raw.nationality === "string"
+        ? raw.nationality
+        : null,
+
+
+    /*
+     * Pierna hábil.
+     *
+     * Si la fuente no la tiene,
+     * queda null.
+     */
+    foot:
+      raw.foot ||
+      raw.preferred_foot ||
+      raw.preferredFoot ||
+      null,
+
+
+    /*
+     * Fuente original.
+     */
+    source:
+      raw.source || null,
+
+
+    source_url:
+      raw.source_url || null
+
+  };
+
+}
+
+
+/* ==========================================================
+   CARGAR PLAYERS.JSON
+   ========================================================== */
+async function loadPlayers() {
+
+  const message = document.getElementById("message");
+
+  try {
+
+    message.textContent = "Cargando base de jugadores...";
+
+    /*
+     * Base:
+     *
+     * data/players.json
+     *
+     * Estructura:
+     *
+     * {
+     *   source: "...",
+     *   league: "...",
+     *   generated_at: "...",
+     *   report: {...},
+     *   players: [...]
+     * }
+     */
+
+    const response = await fetch("./data/players.json", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    /*
+     * IMPORTANTE:
+     *
+     * players.json NO es directamente un array.
+     *
+     * Los jugadores están en:
+     *
+     * data.players
+     */
+
+    if (!data || !Array.isArray(data.players)) {
+      throw new Error(
+        "players.json no contiene un array 'players'"
+      );
+    }
+
+    const rawPlayers = data.players;
+
+    /*
+     * Convertimos el formato de Promiedos
+     * al formato interno del juego.
+     */
+
+    PLAYERS = rawPlayers
+      .map((player, index) =>
+        normalizePlayer(player, index)
+      )
+      .filter(player =>
+        player.name &&
+        player.name !== "Jugador sin nombre"
+      );
+
+    /*
+     * Crear jugadores disponibles para
+     * el modo clásico.
+     *
+     * El clásico necesita apellidos
+     * de exactamente 5 letras.
+     */
+
+    CLASSIC_PLAYERS = [];
+
+    const usedSurnames = new Set();
+
+    for (const player of PLAYERS) {
+
+      const parts = player.name
+        .trim()
+        .split(/\s+/);
+
+      if (!parts.length) {
+        continue;
+      }
+
+      /*
+       * Última palabra del nombre = apellido.
+       *
+       * Ejemplo:
+       *
+       * Adam Bareiro
+       *      ↑
+       */
+
+      const surname = normalize(
+        parts[parts.length - 1]
+      );
+
+      /*
+       * El clásico necesita exactamente
+       * 5 letras.
+       */
+
+      if (
+        surname.length === 5 &&
+        !usedSurnames.has(surname)
+      ) {
+
+        usedSurnames.add(surname);
+
+        CLASSIC_PLAYERS.push({
+          ...player,
+          surname
+        });
+
+      }
+
+    }
+
+    /*
+     * Información de la base.
+     */
+
+    console.log("=================================");
+    console.log("FUTBOLLE — BASE DE DATOS");
+    console.log("=================================");
+
+    console.log(
+      "Fuente:",
+      data.source || "—"
+    );
+
+    console.log(
+      "Liga:",
+      data.league || "—"
+    );
+
+    console.log(
+      "Generado:",
+      data.generated_at || "—"
+    );
+
+    console.log(
+      "Jugadores cargados:",
+      PLAYERS.length
+    );
+
+    console.log(
+      "Jugadores para clásico:",
+      CLASSIC_PLAYERS.length
+    );
+
+    if (data.report) {
+      console.log(
+        "Reporte:",
+        data.report
+      );
+    }
+
+    console.log("=================================");
+
+    /*
+     * Habilitamos los inputs.
+     */
+
+    classicInput.disabled = false;
+    whoInput.disabled = false;
+
+    message.textContent = "";
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      "Error cargando players.json:",
+      error
+    );
+
+    message.textContent =
+      "No se pudo cargar la base de jugadores.";
+
+    classicInput.disabled = true;
+    whoInput.disabled = true;
+
+    return false;
+  }
+}
+
+/* ==========================================================
+   ESTADÍSTICAS
+   ========================================================== */
+
+function loadStats() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        "futbolle_stats"
+      );
+
+
+    if (!saved) {
+
+      return {
+        played: 0,
+        wins: 0,
+        streak: 0
+      };
+
+    }
+
+
+    const parsed =
+      JSON.parse(saved);
+
+
+    return {
+
+      played:
+        Number(parsed.played) || 0,
+
+      wins:
+        Number(parsed.wins) || 0,
+
+      streak:
+        Number(parsed.streak) || 0
+
+    };
+
+  } catch {
+
+    return {
+      played: 0,
+      wins: 0,
+      streak: 0
+    };
+
+  }
+
+}
+
+
+function saveStats() {
+
+  localStorage.setItem(
+    "futbolle_stats",
+    JSON.stringify(stats)
+  );
+
+  updateStats();
+
+}
+
+
+function updateStats() {
+
+  document.getElementById(
+    "played"
+  ).textContent =
+    stats.played;
+
+
+  document.getElementById(
+    "streak"
+  ).textContent =
+    stats.streak;
+
+
+  document.getElementById(
+    "wins"
+  ).textContent =
+    stats.played
+      ? Math.round(
+          stats.wins /
+          stats.played *
+          100
+        ) + "%"
+      : "0%";
+
+}
+
+
+/* ==========================================================
+   ÍNDICE DIARIO
+   ========================================================== */
+
+function dailyIndex(length, offset = 0) {
+
+  if (!length) {
+    return 0;
+  }
+
+
+  const day =
+    Math.floor(
+      Date.now() / 86400000
+    );
+
+
+  return Math.abs(
+    (day + offset) % length
+  );
+
+}
+
+
+/* ==========================================================
+   MENSAJE
+   ========================================================== */
+
+function toast(text) {
+
+  const el =
+    document.getElementById("message");
+
+
+  el.textContent = text;
+
+
+  clearTimeout(
+    window.__futbolleToast
+  );
+
+
+  window.__futbolleToast =
+    setTimeout(() => {
+
+      el.textContent = "";
+
+    }, 1800);
+
+}
+
+
+/* ==========================================================
+   BUSCAR JUGADOR
+   ========================================================== */
+
+function findPlayer(query) {
+
+  const q =
+    normalize(query);
+
+
+  /*
+   * Primero buscamos nombre completo.
+   */
+
+  const exactName =
+    PLAYERS.find(player =>
+      normalize(player.name) === q
+    );
+
+
+  if (exactName) {
+    return exactName;
+  }
+
+
+  /*
+   * Después apellido.
+   */
+
+  const exactSurname =
+    PLAYERS.find(player => {
+
+      const parts =
+        normalize(player.name)
+          .split(" ");
+
+      return parts.at(-1) === q;
+
+    });
+
+
+  return exactSurname || null;
+
+}
+
+
+/* ==========================================================
+   CAMBIO DE MODO
+   ========================================================== */
+
+document
+  .querySelectorAll(".mode-button")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        switchMode(
+          button.dataset.mode
+        );
+
+      }
+    );
+
+  });
+
+
+function switchMode(newMode) {
+
+  mode = newMode;
+
+
+  document
+    .querySelectorAll(".mode-button")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.mode === mode
+      );
+
+    });
+
+
+  const classic =
+    document.getElementById(
+      "classicMode"
+    );
+
+
+  const who =
+    document.getElementById(
+      "whoMode"
+    );
+
+
+  classic.classList.toggle(
+    "hidden",
+    mode !== "classic"
+  );
+
+
+  who.classList.toggle(
+    "hidden",
+    mode !== "who"
+  );
+
+
+  document.getElementById(
+    "modeDescription"
+  ).textContent =
+    mode === "classic"
+      ? "Adiviná el apellido en 6 intentos."
+      : "Descubrí al jugador usando sus datos.";
+
+
+  document.getElementById(
+    "message"
+  ).textContent = "";
+
+
+  if (mode === "classic") {
+
+    classicInput.focus();
+
+  } else {
+
+    whoInput.focus();
+
+  }
+
+}
+
+
+/* ==========================================================
+   CLÁSICO
+   ========================================================== */
+
+function initClassic() {
+
+  if (!CLASSIC_PLAYERS.length) {
+
+    toast(
+      "No hay suficientes jugadores para el clásico."
+    );
+
+    return;
+
+  }
+
+
+  const index =
+    dailyIndex(
+      CLASSIC_PLAYERS.length
+    );
+
+
+  classicAnswer =
+    CLASSIC_PLAYERS[index];
+
+
+  classicGuesses = [];
+
+  classicOver = false;
+
+
+  classicInput.disabled = false;
+
+  classicInput.value = "";
+
+
+  classicSuggestions.innerHTML = "";
+
+  classicSuggestions.style.display =
+    "none";
+
+
+  buildClassicBoard();
+
+  buildKeyboard();
+
+}
+
+
+/* ==========================================================
+   TABLERO CLÁSICO
+   ========================================================== */
+
+function buildClassicBoard() {
+
+  classicBoard.innerHTML = "";
+
+
+  for (
+    let row = 0;
+    row < 6;
+    row++
+  ) {
+
+    const rowEl =
+      document.createElement("div");
+
+
+    rowEl.className =
+      "classic-row";
+
+
+    for (
+      let col = 0;
+      col < 5;
+      col++
+    ) {
+
+      const cell =
+        document.createElement("div");
+
+
+      cell.className =
+        "classic-cell";
+
+
+      rowEl.appendChild(cell);
+
+    }
+
+
+    classicBoard.appendChild(rowEl);
+
+  }
+
+}
+
+
+/* ==========================================================
+   EVALUAR PALABRA
+   ========================================================== */
+
+function evaluateClassic(
+  guess,
+  target
+) {
+
+  const result =
+    Array(target.length)
+      .fill("absent");
+
+
+  const counts = {};
+
+
+  for (const char of target) {
+
+    counts[char] =
+      (counts[char] || 0) + 1;
+
+  }
+
+
+  /*
+   * Primero verdes.
+   */
+
+  [...guess].forEach(
+    (char, index) => {
+
+      if (
+        char === target[index]
+      ) {
+
+        result[index] =
+          "correct";
+
+        counts[char]--;
+
+      }
+
+    }
+  );
+
+
+  /*
+   * Después amarillos.
+   */
+
+  [...guess].forEach(
+    (char, index) => {
+
+      if (
+        result[index] ===
+        "correct"
+      ) {
+        return;
+      }
+
+
+      if (
+        (counts[char] || 0) > 0
+      ) {
+
+        result[index] =
+          "present";
+
+        counts[char]--;
+
+      }
+
+    }
+  );
+
+
+  return result;
+
+}
+
+
+/* ==========================================================
+   PINTAR FILA
+   ========================================================== */
+
+function paintClassicRow(
+  guess,
+  rowIndex
+) {
+
+  const target =
+    normalize(
+      classicAnswer.surname
+    );
+
+
+  const result =
+    evaluateClassic(
+      guess,
+      target
+    );
+
+
+  const row =
+    classicBoard.children[
+      rowIndex
+    ];
+
+
+  [...guess].forEach(
+    (letter, index) => {
+
+      const cell =
+        row.children[index];
+
+
+      if (!cell) {
+        return;
+      }
+
+
+      cell.textContent =
+        letter;
+
+
+      cell.classList.add(
+        "filled",
+        "pop"
+      );
+
+
+      setTimeout(() => {
+
+        cell.classList.remove(
+          "pop"
+        );
+
+      }, 130);
+
+
+      cell.classList.add(
+        result[index]
+      );
+
+    }
+  );
+
+
+  updateKeyboard(
+    guess,
+    result
+  );
+
+}
+
+
+/* ==========================================================
+   INPUT CLÁSICO
+   ========================================================== */
+
+function renderClassicInput() {
+
+  const row =
+    classicBoard.children[
+      classicGuesses.length
+    ];
+
+
+  if (!row) {
+    return;
+  }
+
+
+  /*
+   * Limpiar fila actual.
+   */
+
+  [...row.children].forEach(
+    cell => {
+
+      cell.textContent = "";
+
+      cell.classList.remove(
+        "filled"
+      );
+
+    }
+  );
+
+
+  [...classicInput.value]
+    .forEach(
+      (letter, index) => {
+
+        if (
+          !row.children[index]
+        ) {
+          return;
+        }
+
+
+        row.children[index]
+          .textContent =
+          letter;
+
+
+        row.children[index]
+          .classList.add(
+            "filled"
+          );
+
+      }
+    );
+
+}
+
+
+/* ==========================================================
+   ENVIAR CLÁSICO
+   ========================================================== */
+
+function submitClassic() {
+
+  if (classicOver) {
+    return;
+  }
+
+
+  const guess =
+    normalize(
+      classicInput.value
+    );
+
+
+  if (guess.length !== 5) {
+
+    toast(
+      "Escribí un apellido de 5 letras"
+    );
+
+    return;
+
+  }
+
+
+  const guessedPlayer =
+    CLASSIC_PLAYERS.find(
+      player =>
+        normalize(
+          player.surname
+        ) === guess
+    );
+
+
+  if (!guessedPlayer) {
+
+    toast(
+      "Ese apellido no está disponible"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    classicGuesses.includes(
+      guess
+    )
+  ) {
+
+    toast(
+      "Ya probaste ese apellido"
+    );
+
+    return;
+
+  }
+
+
+  classicGuesses.push(
+    guess
+  );
+
+
+  paintClassicRow(
+    guess,
+    classicGuesses.length - 1
+  );
+
+
+  classicInput.value = "";
+
+
+  if (
+    guess ===
+    normalize(
+      classicAnswer.surname
+    )
+  ) {
+
+    finishClassic(true);
+
+    return;
+
+  }
+
+
+  if (
+    classicGuesses.length === 6
+  ) {
+
+    finishClassic(false);
+
+  }
+
+}
+
+
+/* ==========================================================
+   FINAL CLÁSICO
+   ========================================================== */
+
+function finishClassic(win) {
+
+  classicOver = true;
+
+  classicInput.disabled = true;
+
+
+  stats.played++;
+
+
+  if (win) {
+
+    stats.wins++;
+
+    stats.streak++;
+
+  } else {
+
+    stats.streak = 0;
+
+  }
+
+
+  saveStats();
+
+
+  showResult({
+
+    win,
+
+    title:
+      win
+        ? "¡Golazo!"
+        : "Se terminó el partido",
+
+    subtitle:
+      win
+        ? `Lo sacaste en ${classicGuesses.length} intento${classicGuesses.length === 1 ? "" : "s"}.`
+        : "El jugador del día era:",
+
+    answer:
+      classicAnswer.name,
+
+    attempts:
+      classicGuesses.length
+
+  });
+
+}
+
+
+/* ==========================================================
+   TECLADO
+   ========================================================== */
+
+const keyboardRows = [
+
+  "QWERTYUIOP",
+
+  "ASDFGHJKLÑ",
+
+  "ZXCVBNM"
+
+];
+
+
+function buildKeyboard() {
+
+  const keyboard =
+    document.getElementById(
+      "classicKeyboard"
+    );
+
+
+  keyboard.innerHTML = "";
+
+
+  keyboardRows.forEach(
+    (letters, rowIndex) => {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "key-row";
+
+
+      if (rowIndex === 2) {
+
+        addKey(
+          row,
+          "BORRAR",
+          "wide",
+          backspaceClassic
+        );
+
+      }
+
+
+      [...letters].forEach(
+        letter => {
+
+          addKey(
+            row,
+            letter,
+            "",
+            () =>
+              typeClassic(letter)
+          );
+
+        }
+      );
+
+
+      if (rowIndex === 2) {
+
+        addKey(
+          row,
+          "ENTER",
+          "wide",
+          submitClassic
+        );
+
+      }
+
+
+      keyboard.appendChild(row);
+
+    }
+  );
+
+}
+
+
+function addKey(
+  row,
+  label,
+  extraClass,
+  callback
+) {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.type = "button";
+
+
+  button.className =
+    `key ${extraClass}`;
+
+
+  button.dataset.key =
+    label;
+
+
+  button.textContent =
+    label;
+
+
+  button.addEventListener(
+    "click",
+    callback
+  );
+
+
+  row.appendChild(button);
+
+}
+
+
+function typeClassic(letter) {
+
+  if (classicOver) {
+    return;
+  }
+
+
+  if (
+    classicInput.value.length >= 5
+  ) {
+    return;
+  }
+
+
+  classicInput.value +=
+    letter;
+
+
+  renderClassicInput();
+
+}
+
+
+function backspaceClassic() {
+
+  if (classicOver) {
+    return;
+  }
+
+
+  classicInput.value =
+    classicInput.value.slice(
+      0,
+      -1
+    );
+
+
+  renderClassicInput();
+
+}
+
+
+/* ==========================================================
+   KEYBOARD STATES
+   ========================================================== */
+
+function updateKeyboard(
+  guess,
+  result
+) {
+
+  const priority = {
+
+    absent: 1,
+
+    present: 2,
+
+    correct: 3
+
+  };
+
+
+  [...guess].forEach(
+    (letter, index) => {
+
+      const key =
+        document.querySelector(
+          `#classicKeyboard .key[data-key="${CSS.escape(letter)}"]`
+        );
+
+
+      if (!key) {
+        return;
+      }
+
+
+      const state =
+        result[index];
+
+
+      const oldState =
+        key.dataset.state;
+
+
+      if (
+        !oldState ||
+        priority[state] >
+        priority[oldState]
+      ) {
+
+        key.dataset.state =
+          state;
+
+
+        key.classList.remove(
+          "correct",
+          "present",
+          "absent"
+        );
+
+
+        key.classList.add(
+          state
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ==========================================================
+   AUTOCOMPLETADO CLÁSICO
+   ========================================================== */
+
+classicInput.addEventListener(
+  "input",
+  () => {
+
+    classicInput.value =
+      classicInput.value
+        .replace(
+          /[^a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]/g,
+          ""
+        )
+        .toUpperCase();
+
+
+    showClassicSuggestions();
+
+    renderClassicInput();
+
+  }
+);
+
+
+function showClassicSuggestions() {
+
+  const q =
+    normalize(
+      classicInput.value
+    );
+
+
+  classicSuggestions.innerHTML =
+    "";
+
+
+  if (!q) {
+
+    classicSuggestions.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  const matches =
+    CLASSIC_PLAYERS
+      .filter(player =>
+        normalize(
+          player.surname
+        ).startsWith(q)
+      )
+      .slice(0, 7);
+
+
+  matches.forEach(
+    player => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "suggestion";
+
+
+      const main =
+        document.createElement(
+          "div"
+        );
+
+
+      main.className =
+        "suggestion-main";
+
+
+      const strong =
+        document.createElement(
+          "strong"
+        );
+
+
+      strong.textContent =
+        player.surname;
+
+
+      const small =
+        document.createElement(
+          "small"
+        );
+
+
+      small.textContent =
+        `${player.name} · ${player.club}`;
+
+
+      main.appendChild(
+        strong
+      );
+
+      main.appendChild(
+        small
+      );
+
+
+      const arrow =
+        document.createElement(
+          "span"
+        );
+
+
+      arrow.className =
+        "suggestion-arrow";
+
+
+      arrow.textContent =
+        "›";
+
+
+      item.appendChild(
+        main
+      );
+
+
+      item.appendChild(
+        arrow
+      );
+
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          classicInput.value =
+            player.surname;
+
+
+          classicSuggestions.style.display =
+            "none";
+
+
+          renderClassicInput();
+
+          classicInput.focus();
+
+        }
+      );
+
+
+      classicSuggestions.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  classicSuggestions.style.display =
+    matches.length
+      ? "block"
+      : "none";
+
+}
+
+
+/* ==========================================================
+   ¿QUIÉN ES?
+   ========================================================== */
+
+function initWho() {
+
+  if (!PLAYERS.length) {
+    return;
+  }
+
+
+  const index =
+    dailyIndex(
+      PLAYERS.length,
+      17
+    );
+
+
+  whoAnswer =
+    PLAYERS[index];
+
+
+  whoGuesses = [];
+
+  whoOver = false;
+
+
+  whoInput.disabled = false;
+
+  whoInput.value = "";
+
+
+  whoSuggestions.innerHTML =
+    "";
+
+  whoSuggestions.style.display =
+    "none";
+
+
+  whoRows.innerHTML =
+    "";
+
+}
+
+
+/* ==========================================================
+   COMPARAR JUGADORES
+   ========================================================== */
+
+function compareWho(
+  guess,
+  target
+) {
+
+  /*
+   * CLUB
+   */
+
+  const club =
+    guess.club !== "—" &&
+    target.club !== "—" &&
+    guess.club === target.club
+      ? "correct"
+      : "wrong";
+
+
+  /*
+   * POSICIÓN
+   *
+   * Exacta = verde
+   *
+   * Mismo grupo = amarillo
+   */
+
+  let position =
+    "wrong";
+
+
+  if (
+    guess.position_code &&
+    target.position_code &&
+    guess.position_code ===
+      target.position_code
+  ) {
+
+    position = "correct";
+
+  } else if (
+    guess.position_detail &&
+    target.position_detail &&
+    guess.position_detail ===
+      target.position_detail
+  ) {
+
+    position = "correct";
+
+  } else if (
+    guess.position_code &&
+    target.position_code &&
+    normalize(
+      guess.position_code
+    ) ===
+      normalize(
+        target.position_code
+      )
+  ) {
+
+    position = "close";
+
+  }
+
+
+  /*
+   * NACIONALIDAD
+   *
+   * Si no existe en ambos,
+   * no inventamos nada.
+   */
+
+  let nationality = "wrong";
+
+
+  if (
+    guess.nationality &&
+    target.nationality
+  ) {
+
+    nationality =
+      guess.nationality ===
+      target.nationality
+        ? "correct"
+        : "wrong";
+
+  }
+
+
+  /*
+   * EDAD
+   */
+
+  let age = "wrong";
+
+
+  if (
+    guess.age !== null &&
+    target.age !== null
+  ) {
+
+    if (
+      guess.age ===
+      target.age
+    ) {
+
+      age = "correct";
+
+    } else if (
+      Math.abs(
+        guess.age -
+        target.age
+      ) <= 2
+    ) {
+
+      age = "close";
+
+    }
+
+  }
+
+
+  /*
+   * PIERNA HÁBIL
+   */
+
+  let foot = "wrong";
+
+
+  if (
+    guess.foot &&
+    target.foot
+  ) {
+
+    foot =
+      normalize(
+        guess.foot
+      ) ===
+      normalize(
+        target.foot
+      )
+        ? "correct"
+        : "wrong";
+
+  }
+
+
+  /*
+   * ALTURA
+   */
+
+  let height = "wrong";
+
+
+  if (
+    guess.height !== null &&
+    target.height !== null
+  ) {
+
+    if (
+      guess.height ===
+      target.height
+    ) {
+
+      height = "correct";
+
+    } else if (
+      Math.abs(
+        guess.height -
+        target.height
+      ) <= 5
+    ) {
+
+      height = "close";
+
+    }
+
+  }
+
+
+  return {
+
+    club,
+
+    position,
+
+    nationality,
+
+    age,
+
+    foot,
+
+    height
+
+  };
+
+}
+
+
+/* ==========================================================
+   AGREGAR FILA ¿QUIÉN ES?
+   ========================================================== */
+
+function addWhoRow(player) {
+
+  const result =
+    compareWho(
+      player,
+      whoAnswer
+    );
+
+
+  const row =
+    document.createElement(
+      "div"
+    );
+
+
+  row.className =
+    "hints-row";
+
+
+  /*
+   * IMPORTANTE:
+   *
+   * Acá usamos strings.
+   *
+   * NO usamos:
+   *
+   * player.team
+   *
+   * porque eso produciría:
+   *
+   * [object Object]
+   *
+   * Ya normalizamos:
+   *
+   * player.club
+   *
+   * = "Boca Jrs."
+   */
+
+  const values = [
+
+    [
+      player.name,
+      "reveal"
+    ],
+
+    [
+      player.club,
+      result.club
+    ],
+
+    [
+      player.position,
+      result.position
+    ],
+
+    [
+      player.nationality || "—",
+      result.nationality
+    ],
+
+    [
+      player.age !== null
+        ? `${player.age} años`
+        : "—",
+      result.age
+    ],
+
+    [
+      player.foot || "—",
+      result.foot
+    ]
+
+  ];
+
+
+  values.forEach(
+    ([value, state]) => {
+
+      const cell =
+        document.createElement(
+          "div"
+        );
+
+
+      cell.className =
+        `hint-cell ${state}`;
+
+
+      cell.textContent =
+        String(value ?? "—");
+
+
+      row.appendChild(
+        cell
+      );
+
+    }
+  );
+
+
+  whoRows.appendChild(
+    row
+  );
+
+}
+
+
+/* ==========================================================
+   ENVIAR ¿QUIÉN ES?
+   ========================================================== */
+
+function submitWho() {
+
+  if (whoOver) {
+    return;
+  }
+
+
+  const query =
+    whoInput.value.trim();
+
+
+  if (!query) {
+
+    toast(
+      "Escribí un jugador"
+    );
+
+    return;
+
+  }
+
+
+  const player =
+    findPlayer(query);
+
+
+  if (!player) {
+
+    toast(
+      "No encontramos ese jugador"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    whoGuesses.some(
+      p => p.id === player.id
+    )
+  ) {
+
+    toast(
+      "Ya probaste ese jugador"
+    );
+
+    return;
+
+  }
+
+
+  whoGuesses.push(
+    player
+  );
+
+
+  addWhoRow(
+    player
+  );
+
+
+  whoInput.value = "";
+
+
+  whoSuggestions.style.display =
+    "none";
+
+
+  if (
+    player.id ===
+    whoAnswer.id
+  ) {
+
+    finishWho(true);
+
+    return;
+
+  }
+
+
+  if (
+    whoGuesses.length === 6
+  ) {
+
+    finishWho(false);
+
+  }
+
+}
+
+
+/* ==========================================================
+   FINAL ¿QUIÉN ES?
+   ========================================================== */
+
+function finishWho(win) {
+
+  whoOver = true;
+
+  whoInput.disabled = true;
+
+
+  stats.played++;
+
+
+  if (win) {
+
+    stats.wins++;
+
+    stats.streak++;
+
+  } else {
+
+    stats.streak = 0;
+
+  }
+
+
+  saveStats();
+
+
+  showResult({
+
+    win,
+
+    title:
+      win
+        ? "¡Lo encontraste!"
+        : "Se terminó el partido",
+
+    subtitle:
+      win
+        ? `Descubriste al jugador en ${whoGuesses.length} intento${whoGuesses.length === 1 ? "" : "s"}.`
+        : "El jugador del día era:",
+
+    answer:
+      whoAnswer.name,
+
+    attempts:
+      whoGuesses.length
+
+  });
+
+}
+
+
+/* ==========================================================
+   AUTOCOMPLETADO ¿QUIÉN ES?
+   ========================================================== */
+
+whoInput.addEventListener(
+  "input",
+  showWhoSuggestions
+);
+
+
+function showWhoSuggestions() {
+
+  const q =
+    normalize(
+      whoInput.value
+    );
+
+
+  whoSuggestions.innerHTML =
+    "";
+
+
+  if (!q) {
+
+    whoSuggestions.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  /*
+   * Buscamos por:
+   *
+   * nombre completo
+   * nombre
+   * apellido
+   */
+
+  const matches =
+    PLAYERS
+      .filter(player => {
+
+        const name =
+          normalize(
+            player.name
+          );
+
+
+        const surname =
+          normalize(
+            player.name
+              .split(/\s+/)
+              .at(-1)
+          );
+
+
+        return (
+          name.includes(q) ||
+          surname.startsWith(q)
+        );
+
+      })
+      .slice(0, 8);
+
+
+  matches.forEach(
+    player => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "suggestion";
+
+
+      const main =
+        document.createElement(
+          "div"
+        );
+
+
+      main.className =
+        "suggestion-main";
+
+
+      const strong =
+        document.createElement(
+          "strong"
+        );
+
+
+      strong.textContent =
+        player.name;
+
+
+      const small =
+        document.createElement(
+          "small"
+        );
+
+
+      /*
+       * ACÁ ESTÁ OTRA CORRECCIÓN
+       *
+       * Antes:
+       *
+       * ${player.club}
+       *
+       * cuando club era objeto.
+       *
+       * Ahora club ya es:
+       *
+       * "Boca Jrs."
+       */
+
+      small.textContent =
+        `${player.club} · ${player.position}`;
+
+
+      main.appendChild(
+        strong
+      );
+
+      main.appendChild(
+        small
+      );
+
+
+      const arrow =
+        document.createElement(
+          "span"
+        );
+
+
+      arrow.className =
+        "suggestion-arrow";
+
+
+      arrow.textContent =
+        "›";
+
+
+      item.appendChild(
+        main
+      );
+
+      item.appendChild(
+        arrow
+      );
+
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          whoInput.value =
+            player.name;
+
+
+          whoSuggestions.style.display =
+            "none";
+
+
+          whoInput.focus();
+
+        }
+      );
+
+
+      whoSuggestions.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  whoSuggestions.style.display =
+    matches.length
+      ? "block"
+      : "none";
+
+}
+
+
+/* ==========================================================
+   TECLADO FÍSICO
+   ========================================================== */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    /*
+     * ¿QUIÉN ES?
+     */
+
+    if (
+      document.activeElement ===
+      whoInput
+    ) {
+
+      if (
+        event.key === "Enter"
+      ) {
+
+        event.preventDefault();
+
+        submitWho();
+
+      }
+
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        whoSuggestions.style.display =
+          "none";
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * CLÁSICO
+     */
+
+    if (
+      document.activeElement ===
+      classicInput
+    ) {
+
+      if (
+        event.key === "Enter"
+      ) {
+
+        event.preventDefault();
+
+        submitClassic();
+
+      }
+
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        classicSuggestions.style.display =
+          "none";
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * Teclado global.
+     */
+
+    if (
+      mode === "classic"
+    ) {
+
+      if (
+        /^[a-zA-ZñÑ]$/.test(
+          event.key
+        )
+      ) {
+
+        typeClassic(
+          normalize(event.key)
+        );
+
+      }
+
+
+      if (
+        event.key === "Backspace"
+      ) {
+
+        backspaceClassic();
+
+      }
+
+
+      if (
+        event.key === "Enter"
+      ) {
+
+        submitClassic();
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ==========================================================
+   MODAL RESULTADO
+   ========================================================== */
+
+function showResult({
+  win,
+  title,
+  subtitle,
+  answer,
+  attempts
+}) {
+
+  document.getElementById(
+    "resultTitle"
+  ).textContent =
+    title;
+
+
+  document.getElementById(
+    "resultSubtitle"
+  ).textContent =
+    subtitle;
+
+
+  document.getElementById(
+    "resultAnswer"
+  ).textContent =
+    answer;
+
+
+  document.getElementById(
+    "resultAttempts"
+  ).textContent =
+    attempts;
+
+
+  document.getElementById(
+    "resultPlayed"
+  ).textContent =
+    stats.played;
+
+
+  document.getElementById(
+    "resultWinRate"
+  ).textContent =
+    stats.played
+      ? Math.round(
+          stats.wins /
+          stats.played *
+          100
+        ) + "%"
+      : "0%";
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.add("show");
+
+}
+
+
+/* ==========================================================
+   MODAL RESULTADO — CERRAR
+   ========================================================== */
+
+document
+  .getElementById("closeResult")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "resultModal"
+        )
+        .classList.remove(
+          "show"
+        );
+
+    }
+  );
+
+
+/* ==========================================================
+   MODAL AYUDA
+   ========================================================== */
+
+document
+  .getElementById("helpBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "helpModal"
+        )
+        .classList.add(
+          "show"
+        );
+
+    }
+  );
+
+
+document
+  .getElementById("closeHelp")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "helpModal"
+        )
+        .classList.remove(
+          "show"
+        );
+
+    }
+  );
+
+
+/* ==========================================================
+   CERRAR MODALES HACIENDO CLICK AFUERA
+   ========================================================== */
+
+document
+  .querySelectorAll(".modal")
+  .forEach(modal => {
+
+    modal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === modal
+        ) {
+
+          modal.classList.remove(
+            "show"
+          );
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* ==========================================================
+   NUEVA PARTIDA
+   ========================================================== */
+
+document
+  .getElementById("newGameBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (
+        mode === "classic"
+      ) {
+
+        initClassic();
+
+      } else {
+
+        initWho();
+
+      }
+
+
+      document.getElementById(
+        "message"
+      ).textContent = "";
+
+    }
+  );
+
+
+/* ==========================================================
+   COMPARTIR
+   ========================================================== */
+
+document
+  .getElementById("shareBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      const attempts =
+        mode === "classic"
+          ? classicGuesses.length
+          : whoGuesses.length;
+
+
+      const text =
+`FUTBOLLE ⚽
+Modo: ${
+  mode === "classic"
+    ? "Clásico"
+    : "¿Quién es?"
+}
+${attempts}/6`;
+
+
+      try {
+
+        if (
+          navigator.share
+        ) {
+
+          await navigator.share({
+
+            title: "FUTBOLLE",
+
+            text
+
+          });
+
+
+          return;
+
+        }
+
+
+        await navigator.clipboard
+          .writeText(text);
+
+
+        toast(
+          "Resultado copiado"
+        );
+
+      } catch {
+
+        try {
+
+          await navigator.clipboard
+            .writeText(text);
+
+          toast(
+            "Resultado copiado"
+          );
+
+        } catch {
+
+          toast(text);
+
+        }
+
+      }
+
+    }
+  );
+
+
+/* ==========================================================
+   INICIAR APLICACIÓN
+   ========================================================== */
+
+async function startApp() {
+
+  /*
+   * Primero estadísticas.
+   */
+
+  updateStats();
+
+
+  /*
+   * Después cargamos players.json.
+   */
+
+  const loaded =
+    await loadPlayers();
+
+
+  /*
+   * Si falló el JSON,
+   * no iniciamos el juego.
+   */
+
+  if (!loaded) {
+
+    document.getElementById(
+      "modeDescription"
+    ).textContent =
+      "No se pudo cargar la base de jugadores.";
+
+    return;
+
+  }
+
+
+  /*
+   * Inicializamos ambos modos.
+   */
+
+  initClassic();
+
+  initWho();
+
+
+  /*
+   * Arrancamos en clásico.
+   */
+
+  switchMode(
+    "classic"
+  );
+
+
+  document.getElementById(
+    "modeDescription"
+  ).textContent =
+    "Adiviná el apellido en 6 intentos.";
+
+}
+
+
+/*
+ * ARRANQUE
+ */
+
+startApp();
+
+</script>
+
+</body>
+</html>
