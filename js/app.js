@@ -218,26 +218,16 @@ function switchMode(
    NUEVA PARTIDA
    ========================================================= */
 
-document
-  .getElementById("newGameBtn")
-  .addEventListener(
-    "click",
-    () => {
-
-      if (
-        state.mode === "classic"
-      ) {
-
-        initClassic();
-
-      } else {
-
-        initWho();
-
-      }
-
-    }
-  );
+/* =========================================================
+   NUEVA PARTIDA
+   ========================================================= */
+document.getElementById("newGameBtn").addEventListener("click", () => {
+  if (state.mode === "classic") {
+    initClassic(true);
+  } else {
+    initWho(true);
+  }
+});
 
 
 /* =========================================================

@@ -199,25 +199,43 @@ export function clearInput(
 
 /**
  * Crea una sugerencia.
+ * @param {Object} options
+ * @param {string} options.title
+ * @param {string} options.subtitle
+ * @param {Function} options.onClick
+ * @param {boolean} [options.highlighted] - Marca la sugerencia como resaltada (navegación por teclado).
+ * @param {number} [options.index] - Índice dentro de la lista, para id/scroll.
  */
 export function createSuggestion(
   {
     title,
     subtitle,
-    onClick
+    onClick,
+    highlighted = false,
+    index
   }
 ) {
 
   const item =
     document.createElement("div");
 
-  item.className =
-    "suggestion";
+  item.className = highlighted
+    ? "suggestion highlighted"
+    : "suggestion";
 
   item.setAttribute(
     "role",
     "option"
   );
+
+  item.setAttribute(
+    "aria-selected",
+    highlighted ? "true" : "false"
+  );
+
+  if (index !== undefined) {
+    item.id = `suggestion-${index}`;
+  }
 
   const main =
     document.createElement("div");
@@ -289,5 +307,10 @@ export function renderSuggestions(
     suggestions.length
       ? "block"
       : "none";
+
+  container.setAttribute(
+    "role",
+    "listbox"
+  );
 
 }
