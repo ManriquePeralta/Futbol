@@ -2,157 +2,46 @@
    FUTBOLLE — SHARE
    ========================================================= */
 
-import {
-  toast
-} from "./ui.js";
+import { toast } from "./ui.js";
 
+export function initShare(state, classicHandlers, customHandlers) {
+  const shareBtn = document.getElementById("shareBtn");
 
-let state = null;
-let classic = null;
-let who = null;
-
-
-/**
- * Inicializa compartir.
- */
-export function initShare(
-  appState,
-  classicModule,
-  whoModule
-) {
-
-  state = appState;
-
-  classic = classicModule;
-  who = whoModule;
-
-
-  document
-    .getElementById("shareBtn")
-    .addEventListener(
-      "click",
-      share
-    );
-
-}
-
-
-/**
- * Comparte resultado.
- */
-async function share() {
-
-  const data =
-    state.mode === "classic"
-      ? classic.getShareData()
-      : who.getShareData();
-
-
-  const modeName =
-    state.mode === "classic"
-      ? "Clásico"
-      : "¿Quién es?";
-
-
-  const text =
-`FUTBOLLE ⚽
-
-Modo: ${modeName}
-Resultado: ${data.attempts}/${data.maxAttempts}
-
-https://futbolle.com`;
-
-
-  try {
-
-    if (
-      navigator.share
-    ) {
-
-      await navigator.share({
-
-        title:
-          "FUTBOLLE",
-
-        text
-
-      });
-
-      return;
-
-    }
-
-
-    await copyText(text);
-
-    toast(
-      "Resultado copiado."
-    );
-
-  } catch {
-
-    try {
-
-      await copyText(text);
-
-      toast(
-        "Resultado copiado."
-      );
-
-    } catch {
-
-      toast(
-        "No se pudo compartir."
-      );
-
-    }
-
-  }
-
-}
-
-
-/**
- * Copia texto.
- */
-async function copyText(text) {
-
-  if (
-    navigator.clipboard &&
-    window.isSecureContext
-  ) {
-
-    await navigator.clipboard.writeText(
-      text
-    );
-
+  // Validación de seguridad: si el botón no existe en la vista actual, no hacer nada
+  if (!shareBtn) {
     return;
-
   }
 
+  shareBtn.addEventListener("click", async () => {
+    let shareData = null;
 
-  const textarea =
-    document.createElement("textarea");
+    if (customHandlers?.getShareData) {
+      shareData = customHandlers.getShareData();
+    } else if (classicHandlers?.getShareData) {
+      shareData = classicHandlers.getShareData();
+    }
 
-  textarea.value =
-    text;
+    if (!shareData) {
+      return;
+    }
 
-  textarea.style.position =
-    "fixed";
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.warn("Share API error:", err);
+        }
+      }
+    }
 
-  textarea.style.opacity =
-    "0";
-
-  document.body.appendChild(
-    textarea
-  );
-
-  textarea.select();
-
-  document.execCommand(
-    "copy"
-  );
-
-  textarea.remove();
-
+    // Fallback: copiar al portapapeles
+    try {
+      await navigator.clipboard.writeText(shareData.text);
+      toast("¡Resultado copiado al portapapeles!", 2000);
+    } catch (e) {
+      toast("No se pudo copiar el resultado.", 2000);
+    }
+  });
 }

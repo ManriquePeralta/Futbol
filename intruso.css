@@ -1,0 +1,422 @@
+/* =========================================================
+   FUTBOLLE — INTRUSO
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.intruso-page {
+    width: min(
+        100% - 32px,
+        760px
+    );
+    margin: auto;
+    padding-bottom: 70px;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.intruso-header {
+    text-align: center;
+    padding: 52px 0 28px;
+}
+
+.intruso-kicker {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 1000;
+    letter-spacing: 2px;
+}
+
+.intruso-header h1 {
+    margin: 0;
+    font-size: clamp(42px, 8vw, 66px);
+    line-height: .9;
+    letter-spacing: -3px;
+    font-weight: 1000;
+}
+
+.intruso-header p {
+    margin: 14px auto 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* =========================================================
+   GAME BAR
+========================================================= */
+
+.intruso-gamebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.intruso-gamebar > div {
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.intruso-gamebar > div + div {
+    border-left: 1px solid var(--border);
+}
+
+.intruso-gamebar span {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.3px;
+}
+
+.intruso-gamebar strong {
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 1000;
+}
+
+/* =========================================================
+   QUESTION
+========================================================= */
+
+.intruso-question {
+    text-align: center;
+    margin: 30px 0 24px;
+}
+
+.intruso-question > span {
+    color: var(--green);
+    font-size: 9px;
+    font-weight: 1000;
+    letter-spacing: 1.7px;
+}
+
+.intruso-question h2 {
+    margin: 7px 0 7px;
+    font-size: 25px;
+    letter-spacing: -.8px;
+}
+
+.intruso-question p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   BOARD
+========================================================= */
+
+.intruso-board {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+.intruso-player {
+    position: relative;
+    min-height: 145px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #101a15, #08100c);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.intruso-player::before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: -35px;
+    top: -35px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1c5233, transparent 68%);
+    opacity: .28;
+    pointer-events: none;
+}
+
+.intruso-player:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-hover, var(--green));
+    background: linear-gradient(145deg, #14251b, #09120d);
+}
+
+.intruso-player:active {
+    transform: translateY(0);
+}
+
+.intruso-player:disabled {
+    cursor: default;
+}
+
+/* =========================================================
+   NUMBER
+========================================================= */
+
+.intruso-number {
+    position: absolute;
+    top: 13px;
+    left: 15px;
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 1000;
+}
+
+/* =========================================================
+   PLAYER INFO (SIN SPOILERS DURANTE EL JUEGO)
+========================================================= */
+
+.intruso-player-main {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.intruso-player-main strong {
+    font-size: 18px;
+    line-height: 1.1;
+    letter-spacing: -.5px;
+}
+
+/* Ocultos por defecto */
+.intruso-player-main small,
+.intruso-position {
+    display: none;
+}
+
+/* Revelados solo al responder */
+.intruso-player.revealed .intruso-player-main small {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.intruso-player.revealed .intruso-position {
+    display: block;
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    padding: 5px 7px;
+    border-radius: 4px;
+    background: #0d1912;
+    border: 1px solid var(--border);
+    color: #9aaa9f;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+/* =========================================================
+   CORRECT / WRONG
+========================================================= */
+
+.intruso-player.correct {
+    border-color: var(--green);
+    background: linear-gradient(145deg, #123620, #09140d);
+}
+
+.intruso-player.correct .intruso-number {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.intruso-player.wrong {
+    border-color: #a83d3d;
+    background: linear-gradient(145deg, #351616, #120909);
+    animation: intruso-shake .25s ease;
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.intruso-message {
+    height: 24px;
+    margin: 4px 0 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing: 1px;
+}
+
+.intruso-message.correct {
+    color: var(--green);
+}
+
+.intruso-message.wrong {
+    color: #e36b6b;
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.intruso-result {
+    margin-top: 18px;
+    padding: 26px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+
+.intruso-result.hidden {
+    display: none;
+}
+
+.intruso-result-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    border-radius: 50%;
+    background: var(--green-dark);
+    color: var(--green);
+    font-size: 23px;
+    font-weight: 1000;
+}
+
+.intruso-result strong {
+    font-size: 17px;
+}
+
+.intruso-result span {
+    margin-top: 3px;
+    font-size: 28px;
+    font-weight: 1000;
+}
+
+.intruso-result small {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.intruso-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 22px;
+}
+
+.intruso-controls button {
+    min-height: 42px;
+    padding: 0 20px;
+    border: 1px solid var(--border-hover, var(--green));
+    border-radius: 7px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 1000;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+}
+
+.intruso-controls button:hover {
+    background: #16221b;
+    border-color: var(--green);
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes intruso-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 560px) {
+    .intruso-page {
+        width: min(100% - 20px, 760px);
+    }
+
+    .intruso-header {
+        padding: 40px 0 22px;
+    }
+
+    .intruso-header h1 {
+        font-size: 44px;
+        letter-spacing: -2px;
+    }
+
+    .intruso-header p {
+        font-size: 12px;
+    }
+
+    .intruso-board {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .intruso-player {
+        min-height: 135px;
+        padding: 14px;
+    }
+
+    .intruso-player-main strong {
+        font-size: 14px;
+    }
+
+    .intruso-player-main small {
+        font-size: 9px;
+    }
+
+    .intruso-position {
+        right: 10px;
+        bottom: 10px;
+        font-size: 8px;
+    }
+}
