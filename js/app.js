@@ -2,30 +2,41 @@
    FUTBOLLE — APP
    ========================================================= */
 
-import {
-  state
-} from "./state.js";
+import { state } from "./state.js";
 
+/* =========================================================
+   CLUB
+   ========================================================= */
 import {
-  loadPlayers
-} from "./data.js";
+  initClubModule,
+  initClub,
+  submitClub,
+  getShareData as getClubShareData
+} from "./club.js";
 
-import {
-  loadStats,
-  getStatsView
-} from "./stats.js";
+/* =========================================================
+   DATA
+   ========================================================= */
+import { loadPlayers } from "./data.js";
 
-import {
-  initUI,
-  getUI,
-  updateStats,
-  toast
-} from "./ui.js";
+/* =========================================================
+   STATS
+   ========================================================= */
+import { loadStats, getStatsView } from "./stats.js";
 
-import {
-  initModals
-} from "./modal.js";
+/* =========================================================
+   UI
+   ========================================================= */
+import { initUI, getUI, updateStats, toast } from "./ui.js";
 
+/* =========================================================
+   MODALS
+   ========================================================= */
+import { initModals } from "./modal.js";
+
+/* =========================================================
+   CLASSIC
+   ========================================================= */
 import {
   initClassicModule,
   initClassic,
@@ -35,6 +46,9 @@ import {
   getShareData as getClassicShareData
 } from "./classic.js";
 
+/* =========================================================
+   WHO
+   ========================================================= */
 import {
   initWhoModule,
   initWho,
@@ -42,318 +56,180 @@ import {
   getShareData as getWhoShareData
 } from "./who.js";
 
-import {
-  initKeyboard
-} from "./keyboard.js";
-
-import {
-  initShare
-} from "./share.js";
-
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+import { initKeyboard } from "./keyboard.js";
 
 /* =========================================================
-   DETECTAR JUEGO
+   SHARE
+   ========================================================= */
+import { initShare } from "./share.js";
+
+/* =========================================================
+   DETECTAR JUEGO O PORTADA
    ========================================================= */
 
-const game =
-  document.body.dataset.game;
+const game = document.body.dataset.game || "home";
 
-if (
-  game !== "classic" &&
-  game !== "who"
-) {
-
-  throw new Error(
-    "FUTBOLLE: <body data-game=\"classic|who\"> es requerido."
-  );
-
-}
-
-state.mode =
-  game;
-
+state.mode = game;
 
 /* =========================================================
-   INIT UI
+   INIT UI & MODALS (GLOBAL PARA TODAS LAS PÁGINAS)
    ========================================================= */
 
 initUI();
+const ui = getUI();
 
-const ui =
-  getUI();
-
+// Inicializar modales en todas las páginas donde existan
+initModals();
 
 /* =========================================================
    STATS
    ========================================================= */
 
-state.stats =
-  loadStats();
+state.stats = loadStats();
 
-updateStats(
-  getStatsView(
-    state.stats
-  )
-);
-
+if (state.stats) {
+  updateStats(getStatsView(state.stats));
+}
 
 /* =========================================================
-   MODALS
-   ========================================================= */
-
-initModals();
-
-
-/* =========================================================
-   MÓDULO DEL JUEGO ACTUAL
+   MÓDULOS ESPECÍFICOS SEGÚN EL MODO
    ========================================================= */
 
 if (game === "classic") {
-
-  initClassicModule(
-    state,
-    ui
-  );
-
-}
-
-if (game === "who") {
-
-  initWhoModule(
-    state,
-    ui
-  );
-
-}
-
-
-/* =========================================================
-   KEYBOARD
-   ========================================================= */
-
-if (game === "classic") {
+  initClassicModule(state, ui);
 
   initKeyboard(
     state,
     {
-      typeLetter:
-        (...args) =>
-          typeLetter(...args),
-
-      backspace:
-        (...args) =>
-          backspace(...args),
-
-      submit:
-        (...args) =>
-          classicSubmit(...args)
+      typeLetter: (...args) => typeLetter(...args),
+      backspace: (...args) => backspace(...args),
+      submit: (...args) => classicSubmit(...args)
     },
     null
   );
-
-}
-
-
-/* =========================================================
-   SHARE
-   ========================================================= */
-
-if (game === "classic") {
 
   initShare(
     state,
     {
-      getShareData:
-        () =>
-          getClassicShareData()
+      getShareData: () => getClassicShareData()
     },
     null
   );
-
 }
 
 if (game === "who") {
+  initWhoModule(state, ui);
 
-  initShare(
-    state,
-    null,
-    {
-      getShareData:
-        () =>
-          getWhoShareData()
-    }
-  );
-
+  initShare(state, null, {
+    getShareData: () => getWhoShareData()
+  });
 }
 
+if (game === "club") {
+  initClubModule(state, ui);
+
+  initShare(state, null, {
+    getShareData: () => getClubShareData()
+  });
+}
 
 /* =========================================================
    CAMBIO DE ESTADÍSTICAS
    ========================================================= */
 
-document.addEventListener(
-  "futbolle:stats-changed",
-  () => {
-
-    updateStats(
-      getStatsView(
-        state.stats
-      )
-    );
-
-  }
-);
-
+document.addEventListener("futbolle:stats-changed", () => {
+  updateStats(getStatsView(state.stats));
+});
 
 /* =========================================================
    NUEVA PARTIDA
    ========================================================= */
 
-const newGameBtn =
-  document.getElementById(
-    "newGameBtn"
-  );
+const newGameBtn = document.getElementById("newGameBtn");
 
 if (newGameBtn) {
-
-  newGameBtn.addEventListener(
-    "click",
-    () => {
-
-      if (game === "classic") {
-        initClassic(true);
-        return;
-      }
-
-      if (game === "who") {
-        initWho(true);
-      }
-
+  newGameBtn.addEventListener("click", () => {
+    if (game === "classic") {
+      initClassic(true);
+    } else if (game === "who") {
+      initWho(true);
+    } else if (game === "club") {
+      initClub(true);
     }
-  );
-
+  });
 }
 
-
 /* =========================================================
-   CARGAR DATOS
+   CARGAR DATOS E INICIAR JUEGO
    ========================================================= */
 
 async function startApp() {
+  // Si estamos en la home/portada sin modo activo, no cargamos módulos de juego
+  if (game === "home") {
+    return;
+  }
 
   try {
-
     /* -----------------------------------------
        DESCRIPCIÓN
-       ----------------------------------------- */
-
+    ----------------------------------------- */
     if (ui.modeDescription) {
-
-      ui.modeDescription.textContent =
-        game === "classic"
-          ? "Adiviná el apellido en 6 intentos."
-          : "Descubrí al jugador usando sus datos.";
-
+      if (game === "classic") {
+        ui.modeDescription.textContent = "Adiviná el apellido en 6 intentos.";
+      } else if (game === "who") {
+        ui.modeDescription.textContent = "Descubrí al jugador usando sus datos.";
+      } else if (game === "club") {
+        ui.modeDescription.textContent = "Reconocé el club a partir de sus jugadores.";
+      }
     }
-
 
     /* -----------------------------------------
-       DESHABILITAR INPUT
-       ----------------------------------------- */
-
-    if (ui.classicInput) {
-
-      ui.classicInput.disabled =
-        true;
-
-    }
-
-    if (ui.whoInput) {
-
-      ui.whoInput.disabled =
-        true;
-
-    }
-
+       DESHABILITAR INPUTS HASTA CARGAR
+    ----------------------------------------- */
+    if (ui.classicInput) ui.classicInput.disabled = true;
+    if (ui.whoInput) ui.whoInput.disabled = true;
+    if (ui.clubInput) ui.clubInput.disabled = true;
 
     /* -----------------------------------------
        CARGAR JUGADORES
-       ----------------------------------------- */
+    ----------------------------------------- */
+    const data = await loadPlayers();
 
-    const data =
-      await loadPlayers();
+    state.players = data.players || [];
+    state.classicPlayers = data.classicPlayers || [];
 
-
-    state.players =
-      data.players;
-
-    state.classicPlayers =
-      data.classicPlayers;
-
-
-    console.log(
-      "FUTBOLLE — jugadores:",
-      state.players.length
-    );
-
-    console.log(
-      "FUTBOLLE — clásicos:",
-      state.classicPlayers.length
-    );
-
+    console.log("FUTBOLLE — jugadores:", state.players.length);
+    console.log("FUTBOLLE — clásicos:", state.classicPlayers.length);
 
     /* -----------------------------------------
-       INICIAR SOLO EL JUEGO ACTUAL
-       ----------------------------------------- */
+       HABILITAR E INICIAR MODO
+    ----------------------------------------- */
+    if (ui.classicInput) ui.classicInput.disabled = false;
+    if (ui.whoInput) ui.whoInput.disabled = false;
+    if (ui.clubInput) ui.clubInput.disabled = false;
 
     if (game === "classic") {
-
       initClassic();
-
-    }
-
-    if (game === "who") {
-
+    } else if (game === "who") {
       initWho();
-
+    } else if (game === "club") {
+      initClub();
     }
 
-
-    /* -----------------------------------------
-       CONFIRMACIÓN
-       ----------------------------------------- */
-
-    toast(
-      `${state.players.length} jugadores cargados.`,
-      1300
-    );
-
-
+    toast(`${state.players.length} jugadores cargados.`, 1300);
   } catch (error) {
-
-    console.error(
-      "FUTBOLLE:",
-      error
-    );
-
+    console.error("FUTBOLLE:", error);
 
     if (ui.modeDescription) {
-
-      ui.modeDescription.textContent =
-        "No se pudo cargar la base de jugadores.";
-
+      ui.modeDescription.textContent = "No se pudo cargar la base de jugadores.";
     }
 
-
-    toast(
-      "Error cargando players.json.",
-      4000
-    );
-
+    toast("Error cargando players.json.", 4000);
   }
-
 }
-
 
 /* =========================================================
    START

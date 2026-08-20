@@ -14,13 +14,6 @@ const elements = {};
    INIT UI
    ========================================================= */
 
-/**
- * Inicializa referencias al DOM.
- *
- * Los elementos de otro juego pueden ser null.
- * Esto es intencional porque ahora classic.html y
- * who.html son páginas independientes.
- */
 export function initUI() {
 
   /* -----------------------------------------
@@ -84,6 +77,44 @@ export function initUI() {
 
 
   /* -----------------------------------------
+     CLUB
+     ----------------------------------------- */
+
+/* -----------------------------------------
+   CLUB
+   ----------------------------------------- */
+
+elements.clubInput =
+  document.getElementById(
+    "clubInput"
+  );
+
+elements.clubSuggestions =
+  document.getElementById(
+    "clubSuggestions"
+  );
+
+elements.clubBoard =
+  document.getElementById(
+    "clubBoard"
+  );
+
+elements.clubAttempts =
+  document.getElementById(
+    "clubAttempts"
+  );
+
+elements.clubMessage =
+  document.getElementById(
+    "clubMessage"
+  );
+
+elements.clubResult =
+  document.getElementById(
+    "clubResult"
+  );
+
+  /* -----------------------------------------
      ESTADÍSTICAS
      ----------------------------------------- */
 
@@ -109,9 +140,6 @@ export function initUI() {
    GET UI
    ========================================================= */
 
-/**
- * Devuelve las referencias DOM.
- */
 export function getUI() {
 
   return elements;
@@ -123,19 +151,19 @@ export function getUI() {
    TOAST
    ========================================================= */
 
-/**
- * Muestra un mensaje temporal.
- */
 export function toast(
   text,
   duration = 1800
 ) {
 
   if (!elements.message) {
+
     console.warn(
       "FUTBOLLE: #message no existe."
     );
+
     return;
+
   }
 
 
@@ -170,9 +198,6 @@ export function toast(
    DESCRIPTION
    ========================================================= */
 
-/**
- * Cambia la descripción del juego.
- */
 export function setDescription(
   text
 ) {
@@ -191,16 +216,11 @@ export function setDescription(
    STATS
    ========================================================= */
 
-/**
- * Actualiza estadísticas globales.
- */
 export function updateStats(
   statsView
 ) {
 
-  if (
-    !statsView
-  ) {
+  if (!statsView) {
     return;
   }
 
@@ -235,9 +255,6 @@ export function updateStats(
    CLEAR INPUT
    ========================================================= */
 
-/**
- * Limpia un input y su autocomplete.
- */
 export function clearInput(
   input,
   suggestions
@@ -268,16 +285,6 @@ export function clearInput(
    CREATE SUGGESTION
    ========================================================= */
 
-/**
- * Crea una sugerencia de autocomplete.
- *
- * @param {Object} options
- * @param {string} options.title
- * @param {string} options.subtitle
- * @param {Function} options.onClick
- * @param {boolean} [options.highlighted]
- * @param {number} [options.index]
- */
 export function createSuggestion(
   {
     title,
@@ -324,10 +331,6 @@ export function createSuggestion(
   }
 
 
-  /* -----------------------------------------
-     CONTENIDO PRINCIPAL
-     ----------------------------------------- */
-
   const main =
     document.createElement(
       "div"
@@ -364,10 +367,6 @@ export function createSuggestion(
   );
 
 
-  /* -----------------------------------------
-     FLECHA
-     ----------------------------------------- */
-
   const arrow =
     document.createElement(
       "span"
@@ -380,10 +379,6 @@ export function createSuggestion(
     "›";
 
 
-  /* -----------------------------------------
-     ARMAR ELEMENTO
-     ----------------------------------------- */
-
   item.appendChild(
     main
   );
@@ -392,10 +387,6 @@ export function createSuggestion(
     arrow
   );
 
-
-  /* -----------------------------------------
-     CLICK
-     ----------------------------------------- */
 
   if (
     typeof onClick === "function"
@@ -418,9 +409,6 @@ export function createSuggestion(
    RENDER SUGGESTIONS
    ========================================================= */
 
-/**
- * Renderiza sugerencias.
- */
 export function renderSuggestions(
   container,
   suggestions

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#05080a">
+    <meta name="description" content="FUTBOLLE CLUB — Adiviná el club del fútbol argentino.">
+    <title>FUTBOLLE — Club</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@500;700&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="general.css">
+    <link rel="stylesheet" href="club.css">
+</head>
+
+<body data-game="club">
+
+    <main class="app">
+
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+        <header class="site-header">
+            <a href="./index.html" class="logo" aria-label="FUTBOLLE inicio">
+                FUTBOL<span>LE</span>
+            </a>
+
+            <div class="header-actions">
+                <button type="button" class="icon-button" id="statsBtn" aria-label="Ver estadísticas" title="Estadísticas">
+                    ▥
+                </button>
+                <button type="button" class="icon-button" id="helpBtn" aria-label="Cómo jugar" title="Cómo jugar">
+                    ?
+                </button>
+            </div>
+        </header>
+
+        <!-- =====================================================
+             HERO
+             ===================================================== -->
+        <section class="hero">
+            <div class="hero-badge">
+                ⚽ MODO CLUB
+            </div>
+            <h1>¿QUÉ CLUB ES?</h1>
+            <p id="modeDescription">
+                Descubrí el club a partir de sus jugadores.
+            </p>
+        </section>
+
+        <!-- =====================================================
+             STATUS
+             ===================================================== -->
+        <section class="status" aria-label="Estado de la partida">
+            <div class="status-item">
+                <span>INTENTOS</span>
+                <strong id="clubAttempts">0 / 6</strong>
+            </div>
+
+            <div class="status-divider"></div>
+
+            <div class="status-item">
+                <span>RACHA</span>
+                <strong id="streak">0</strong>
+            </div>
+
+            <div class="status-divider"></div>
+
+            <div class="status-item">
+                <span>HOY</span>
+                <strong id="dailyNumber">—</strong>
+            </div>
+        </section>
+
+        <!-- =====================================================
+             MESSAGE (ID GLOBAL EXIGIDO POR UI.JS)
+             ===================================================== -->
+        <div class="message" id="message" role="status" aria-live="polite"></div>
+
+        <!-- =====================================================
+             CLUB GAME
+             ===================================================== -->
+        <section class="game-section" id="clubGame">
+
+            <!-- TABLERO DINÁMICO DE PISTAS -->
+            <div class="club-board" id="clubBoard"></div>
+
+            <!-- RESULTADO EN PANTALLA -->
+            <div id="clubResult" class="club-result hidden"></div>
+
+            <!-- =================================================
+                 GUESS INPUT
+                 ================================================= -->
+            <div class="guess-area">
+                <label class="sr-only" for="clubInput">
+                    Escribí el nombre del club
+                </label>
+
+                <input
+                    type="text"
+                    id="clubInput"
+                    class="guess-input"
+                    placeholder="Escribí el nombre de un club..."
+                    autocomplete="off"
+                    autocapitalize="words"
+                    spellcheck="false"
+                    inputmode="text"
+                    aria-autocomplete="list"
+                    aria-controls="clubSuggestions"
+                />
+
+                <div
+                    class="suggestions"
+                    id="clubSuggestions"
+                    role="listbox"
+                    aria-label="Clubes sugeridos"
+                    style="display: none;"
+                ></div>
+            </div>
+
+            <!-- =================================================
+                 ACTIONS
+                 ================================================= -->
+            <div class="actions">
+                <button type="button" class="action-button primary" id="clubSubmitBtn">
+                    <span>✓</span>
+                    CONFIRMAR CLUB
+                </button>
+
+                <button type="button" class="action-button" id="newGameBtn">
+                    <span>↻</span>
+                    NUEVA PARTIDA
+                </button>
+            </div>
+
+            <!-- =================================================
+                 HINTS INFO
+                 ================================================= -->
+            <div class="club-hints" id="clubHints" style="margin-top: 1.5rem;">
+                <div class="club-hint">
+                    <span class="club-hint-icon">◉</span>
+                    <div>
+                        <strong>¿Cómo funciona?</strong>
+                        <p>Cada tarjeta revela un jugador del club secreto.</p>
+                    </div>
+                </div>
+
+                <div class="club-hint">
+                    <span class="club-hint-icon">+</span>
+                    <div>
+                        <strong>Más pistas</strong>
+                        <p>Si fallás, se desbloquea un nuevo jugador para ayudarte.</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+        <!-- =====================================================
+             FOOTER
+             ===================================================== -->
+        <footer class="site-footer" aria-label="Información de FUTBOLLE">
+            <span>FUTBOLLE</span>
+            <span>FÚTBOL ARGENTINO</span>
+        </footer>
+
+    </main>
+
+    <!-- =========================================================
+         STATS MODAL
+         ========================================================= -->
+    <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+        <div class="modal-card">
+            <div class="modal-top">
+                <span class="modal-kicker">FUTBOLLE / CLUB</span>
+                <h2 id="statsTitle">ESTADÍSTICAS</h2>
+            </div>
+
+            <div class="stats" id="stats">
+                <div class="stat">
+                    <strong id="statPlayed">0</strong>
+                    <span>Jugadas</span>
+                </div>
+                <div class="stat">
+                    <strong id="statWins">0</strong>
+                    <span>Victorias</span>
+                </div>
+                <div class="stat">
+                    <strong id="statStreak">0</strong>
+                    <span>Racha</span>
+                </div>
+            </div>
+
+            <button type="button" class="modal-close" data-close-modal>
+                CERRAR
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         HELP MODAL
+         ========================================================= -->
+    <div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <div class="modal-card">
+            <div class="modal-top">
+                <span class="modal-kicker">FUTBOLLE / REGLAS</span>
+                <h2 id="helpTitle">¿CÓMO JUGAR?</h2>
+            </div>
+
+            <div class="help-game">
+                <div class="help-game-title">
+                    <span class="help-number">01</span>
+                    <span>MIRÁ LAS PISTAS</span>
+                </div>
+                <p>Vas a recibir información de jugadores pertenecientes a un club secreto.</p>
+            </div>
+
+            <div class="help-game">
+                <div class="help-game-title">
+                    <span class="help-number">02</span>
+                    <span>ADIVINÁ EL CLUB</span>
+                </div>
+                <p>Escribí el nombre del club que creés que corresponde al plantel.</p>
+            </div>
+
+            <div class="help-game">
+                <div class="help-game-title">
+                    <span class="help-number">03</span>
+                    <span>CONSEGUÍ MÁS PISTAS</span>
+                </div>
+                <p>Cada intento fallido desbloqueará un nuevo jugador de la lista.</p>
+            </div>
+
+            <button type="button" class="modal-close" data-close-modal>
+                ENTENDIDO
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         RESULT MODAL
+         ========================================================= -->
+    <div class="modal" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <div class="modal-card">
+            <div class="result-icon">⚽</div>
+            <span class="modal-kicker">DESAFÍO COMPLETADO</span>
+            <h2 id="resultTitle">¡LO ENCONTRASTE!</h2>
+            <div class="answer" id="resultAnswer">CLUB</div>
+
+            <div class="daily-complete" id="dailyComplete">
+                <strong>PARTIDA TERMINADA</strong>
+                <p id="resultDescription">Volvé mañana para un nuevo desafío.</p>
+            </div>
+
+            <div class="stats" id="resultStats">
+                <div class="stat">
+                    <strong id="resultAttempts">0</strong>
+                    <span>Intentos</span>
+                </div>
+                <div class="stat">
+                    <strong id="resultCurrentStreak">0</strong>
+                    <span>Racha</span>
+                </div>
+                <div class="stat">
+                    <strong id="resultPlayed">0</strong>
+                    <span>Jugadas</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="modal-close" id="shareBtn">
+                    COMPARTIR
+                </button>
+            </div>
+
+            <button type="button" class="action-button" data-close-modal style="width:100%; margin-top:7px;">
+                CERRAR
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         TOAST
+         ========================================================= -->
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- =========================================================
+         CONTROL DE MODALES (FALLBACK DIRECTO)
+         ========================================================= -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const statsBtn = document.getElementById("statsBtn");
+            const helpBtn = document.getElementById("helpBtn");
+            const statsModal = document.getElementById("statsModal");
+            const helpModal = document.getElementById("helpModal");
+
+            if (statsBtn && statsModal) {
+                statsBtn.addEventListener("click", () => {
+                    statsModal.classList.add("open", "active");
+                });
+            }
+
+            if (helpBtn && helpModal) {
+                helpBtn.addEventListener("click", () => {
+                    helpModal.classList.add("open", "active");
+                });
+            }
+
+            document.querySelectorAll("[data-close-modal]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    document.querySelectorAll(".modal").forEach(m => m.classList.remove("open", "active"));
+                });
+            });
+        });
+    </script>
+
+    <!-- =========================================================
+         APP
+         ========================================================= -->
+    <script type="module" src="js/app.js"></script>
+
+</body>
+
+</html>
