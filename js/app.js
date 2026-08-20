@@ -19,7 +19,6 @@ import {
   initUI,
   getUI,
   updateStats,
-  renderMode,
   toast
 } from "./ui.js";
 
@@ -29,12 +28,18 @@ import {
 
 import {
   initClassicModule,
-  initClassic
+  initClassic,
+  typeLetter,
+  backspace,
+  submit as classicSubmit,
+  getShareData as getClassicShareData
 } from "./classic.js";
 
 import {
   initWhoModule,
-  initWho
+  initWho,
+  submit as whoSubmit,
+  getShareData as getWhoShareData
 } from "./who.js";
 
 import {
@@ -44,6 +49,28 @@ import {
 import {
   initShare
 } from "./share.js";
+
+
+/* =========================================================
+   DETECTAR JUEGO
+   ========================================================= */
+
+const game =
+  document.body.dataset.game;
+
+if (
+  game !== "classic" &&
+  game !== "who"
+) {
+
+  throw new Error(
+    "FUTBOLLE: <body data-game=\"classic|who\"> es requerido."
+  );
+
+}
+
+state.mode =
+  game;
 
 
 /* =========================================================
@@ -78,73 +105,86 @@ initModals();
 
 
 /* =========================================================
-   MODULES
+   MÓDULO DEL JUEGO ACTUAL
    ========================================================= */
 
-initClassicModule(
-  state,
-  ui
-);
+if (game === "classic") {
 
-initWhoModule(
-  state,
-  ui
-);
+  initClassicModule(
+    state,
+    ui
+  );
 
-initKeyboard(
-  state,
-  {
-    typeLetter:
-      (...args) =>
-        import("./classic.js")
-          .then(module =>
-            module.typeLetter(...args)
-          ),
+}
 
-    backspace:
-      (...args) =>
-        import("./classic.js")
-          .then(module =>
-            module.backspace(...args)
-          ),
+if (game === "who") {
 
-    submit:
-      (...args) =>
-        import("./classic.js")
-          .then(module =>
-            module.submit(...args)
-          )
+  initWhoModule(
+    state,
+    ui
+  );
 
-  },
-  {
-    submit:
-      (...args) =>
-        import("./who.js")
-          .then(module =>
-            module.submit(...args)
-          )
-  }
-);
+}
 
-initShare(
-  state,
-  {
-    getShareData:
-      () =>
-        import("./classic.js")
-          .then(module =>
-            module.getShareData()
-          )
-  },
-  {
-    getShareData:
-      () =>
-        import("./who.js")
-          .then(module =>
-            module.getShareData()
-          )
-  }
-);
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+if (game === "classic") {
+
+  initKeyboard(
+    state,
+    {
+      typeLetter:
+        (...args) =>
+          typeLetter(...args),
+
+      backspace:
+        (...args) =>
+          backspace(...args),
+
+      submit:
+        (...args) =>
+          classicSubmit(...args)
+    },
+    null
+  );
+
+}
+
+
+/* =========================================================
+   SHARE
+   ========================================================= */
+
+if (game === "classic") {
+
+  initShare(
+    state,
+    {
+      getShareData:
+        () =>
+          getClassicShareData()
+    },
+    null
+  );
+
+}
+
+if (game === "who") {
+
+  initShare(
+    state,
+    null,
+    {
+      getShareData:
+        () =>
+          getWhoShareData()
+    }
+  );
+
+}
 
 
 /* =========================================================
@@ -166,68 +206,33 @@ document.addEventListener(
 
 
 /* =========================================================
-   CAMBIO DE MODO
+   NUEVA PARTIDA
    ========================================================= */
 
-ui.modeButtons.forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        switchMode(
-          button.dataset.mode
-        );
-
-      }
-    );
-
-  }
-);
-
-
-function switchMode(
-  newMode
-) {
-
-  state.mode =
-    newMode;
-
-  renderMode(
-    state.mode
+const newGameBtn =
+  document.getElementById(
+    "newGameBtn"
   );
 
+if (newGameBtn) {
 
-  if (
-    state.mode === "classic"
-  ) {
+  newGameBtn.addEventListener(
+    "click",
+    () => {
 
-    ui.classicInput.focus();
+      if (game === "classic") {
+        initClassic(true);
+        return;
+      }
 
-  } else {
+      if (game === "who") {
+        initWho(true);
+      }
 
-    ui.whoInput.focus();
-
-  }
+    }
+  );
 
 }
-
-
-/* =========================================================
-   NUEVA PARTIDA
-   ========================================================= */
-
-/* =========================================================
-   NUEVA PARTIDA
-   ========================================================= */
-document.getElementById("newGameBtn").addEventListener("click", () => {
-  if (state.mode === "classic") {
-    initClassic(true);
-  } else {
-    initWho(true);
-  }
-});
 
 
 /* =========================================================
@@ -238,15 +243,42 @@ async function startApp() {
 
   try {
 
-    ui.modeDescription.textContent =
-      "Cargando jugadores...";
+    /* -----------------------------------------
+       DESCRIPCIÓN
+       ----------------------------------------- */
 
-    ui.classicInput.disabled =
-      true;
+    if (ui.modeDescription) {
 
-    ui.whoInput.disabled =
-      true;
+      ui.modeDescription.textContent =
+        game === "classic"
+          ? "Adiviná el apellido en 6 intentos."
+          : "Descubrí al jugador usando sus datos.";
 
+    }
+
+
+    /* -----------------------------------------
+       DESHABILITAR INPUT
+       ----------------------------------------- */
+
+    if (ui.classicInput) {
+
+      ui.classicInput.disabled =
+        true;
+
+    }
+
+    if (ui.whoInput) {
+
+      ui.whoInput.disabled =
+        true;
+
+    }
+
+
+    /* -----------------------------------------
+       CARGAR JUGADORES
+       ----------------------------------------- */
 
     const data =
       await loadPlayers();
@@ -270,21 +302,26 @@ async function startApp() {
     );
 
 
-    /*
-     * Inicializar ambos juegos.
-     */
-    initClassic();
+    /* -----------------------------------------
+       INICIAR SOLO EL JUEGO ACTUAL
+       ----------------------------------------- */
 
-    initWho();
+    if (game === "classic") {
+
+      initClassic();
+
+    }
+
+    if (game === "who") {
+
+      initWho();
+
+    }
 
 
-    /*
-     * Arrancar en clásico.
-     */
-    switchMode(
-      "classic"
-    );
-
+    /* -----------------------------------------
+       CONFIRMACIÓN
+       ----------------------------------------- */
 
     toast(
       `${state.players.length} jugadores cargados.`,
@@ -300,8 +337,12 @@ async function startApp() {
     );
 
 
-    ui.modeDescription.textContent =
-      "No se pudo cargar la base de jugadores.";
+    if (ui.modeDescription) {
+
+      ui.modeDescription.textContent =
+        "No se pudo cargar la base de jugadores.";
+
+    }
 
 
     toast(

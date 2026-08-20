@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b0e">
+
+  <meta
+    name="description"
+    content="FUTBOLLE — Adiviná jugadores del fútbol argentino."
+  >
+
+  <title>FUTBOLLE — Adiviná al jugador</title>
+
+  <link rel="stylesheet" href="./futbolle.css">
+</head>
+
+<body data-game="classic">
+
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="site-header">
+
+      <a
+        class="logo"
+        href="./"
+        aria-label="FUTBOLLE inicio"
+      >
+        FUTBOL<span>LE</span>
+      </a>
+
+      <div class="header-actions">
+
+        <button
+          class="icon-button"
+          id="helpBtn"
+          type="button"
+          aria-label="Cómo jugar"
+          title="Cómo jugar"
+        >
+          ?
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <main>
+
+      <!-- HERO -->
+      <section class="hero">
+
+        <div class="hero-badge">
+          ⚽ FÚTBOL ARGENTINO
+        </div>
+
+        <h1>
+          Adiviná al jugador.
+        </h1>
+
+        <p id="modeDescription">
+          Cargando jugadores...
+        </p>
+
+      </section>
+
+
+      <!-- MODOS -->
+
+
+      <!-- ESTADÍSTICAS -->
+      <section
+        class="status"
+        aria-label="Estadísticas"
+      >
+
+        <div class="status-item">
+          <span>Racha</span>
+          <strong id="streak">0</strong>
+        </div>
+
+        <div class="status-divider"></div>
+
+        <div class="status-item">
+          <span>Partidas</span>
+          <strong id="played">0</strong>
+        </div>
+
+        <div class="status-divider"></div>
+
+        <div class="status-item">
+          <span>Victorias</span>
+          <strong id="wins">0%</strong>
+        </div>
+
+      </section>
+
+
+      <!-- MENSAJE -->
+      <div
+        id="message"
+        class="message"
+        aria-live="polite"
+      ></div>
+
+
+      <!-- =========================================
+           JUEGO CLÁSICO
+           ========================================= -->
+      <section
+        id="classicMode"
+        class="game-section"
+      >
+
+        <div
+          id="classicBoard"
+          class="classic-board"
+          aria-label="Tablero clásico"
+        ></div>
+
+
+        <div class="guess-area">
+
+          <label
+            class="sr-only"
+            for="classicInput"
+          >
+            Apellido del jugador
+          </label>
+
+          <input
+            id="classicInput"
+            class="guess-input"
+            type="text"
+            maxlength="5"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            placeholder="Escribí el apellido..."
+            disabled
+          >
+
+          <div
+            id="classicSuggestions"
+            class="suggestions"
+            role="listbox"
+          ></div>
+
+        </div>
+
+
+        <div
+          id="classicKeyboard"
+          class="keyboard"
+          aria-label="Teclado"
+        ></div>
+
+      </section>
+
+
+      <!-- =========================================
+           JUEGO ¿QUIÉN ES?
+           ========================================= -->
+      <section
+        id="whoMode"
+        class="game-section who-panel hidden"
+      >
+
+        <div class="who-intro">
+
+          <div class="who-intro-icon">
+            🔎
+          </div>
+
+          <div>
+            <strong>Encontrá al jugador.</strong>
+
+            <p>
+              Probá con cualquier jugador y usá
+              las pistas para acercarte a la respuesta.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div
+          class="hints-wrapper"
+          role="table"
+          aria-label="Pistas"
+        >
+
+          <div class="hints-head" role="row">
+
+            <span>Jugador</span>
+            <span>Club</span>
+            <span>Posición</span>
+            <span>Nac.</span>
+            <span>Edad</span>
+            <span>Pie</span>
+
+          </div>
+
+
+          <div
+            id="whoRows"
+            class="hints-body"
+          ></div>
+
+        </div>
+
+
+        <div class="guess-area">
+
+          <label
+            class="sr-only"
+            for="whoInput"
+          >
+            Nombre del jugador
+          </label>
+
+          <input
+            id="whoInput"
+            class="guess-input"
+            type="text"
+            maxlength="60"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="words"
+            spellcheck="false"
+            placeholder="Escribí el jugador..."
+            disabled
+          >
+
+          <div
+            id="whoSuggestions"
+            class="suggestions"
+            role="listbox"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ACCIONES -->
+      <div class="actions">
+
+        <button
+          id="newGameBtn"
+          class="action-button"
+          type="button"
+        >
+          <span>↻</span>
+          Nueva partida
+        </button>
+
+        <button
+          id="shareBtn"
+          class="action-button primary"
+          type="button"
+        >
+          <span>↗</span>
+          Compartir
+        </button>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- =========================================
+       MODAL RESULTADO
+       ========================================= -->
+  <div
+    id="resultModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal-card result-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="resultTitle"
+    >
+
+      <div class="result-icon" id="resultIcon">
+        ⚽
+      </div>
+
+      <h2 id="resultTitle">
+        ¡Golazo!
+      </h2>
+
+      <div
+        id="resultSubtitle"
+        class="modal-subtitle"
+      ></div>
+
+      <div
+        id="resultAnswer"
+        class="answer"
+      ></div>
+
+
+      <div class="stats">
+
+        <div class="stat">
+          <strong id="resultAttempts">-</strong>
+          <span>INTENTOS</span>
+        </div>
+
+        <div class="stat">
+          <strong id="resultPlayed">0</strong>
+          <span>PARTIDAS</span>
+        </div>
+
+        <div class="stat">
+          <strong id="resultWinRate">0%</strong>
+          <span>VICTORIAS</span>
+        </div>
+
+      </div>
+
+
+      <button
+        id="closeResult"
+        class="modal-close"
+        type="button"
+      >
+        Seguir jugando
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       MODAL AYUDA
+       ========================================= -->
+  <div
+    id="helpModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="helpTitle"
+    >
+
+      <div class="modal-top">
+
+        <div>
+          <span class="modal-kicker">
+            FUTBOLLE
+          </span>
+
+          <h2 id="helpTitle">
+            Cómo jugar
+          </h2>
+        </div>
+
+      </div>
+
+
+      <div class="modal-subtitle">
+        Dos juegos. Una pelota. Un jugador.
+      </div>
+
+
+      <div class="help-game">
+
+        <div class="help-game-title">
+          <span class="help-number">01</span>
+          CLÁSICO
+        </div>
+
+        <p>
+          Adiviná el apellido del jugador en
+          hasta 6 intentos.
+        </p>
+
+      </div>
+
+
+      <div class="help-game">
+
+        <div class="help-game-title">
+          <span class="help-number">02</span>
+          ¿QUIÉN ES?
+        </div>
+
+        <p>
+          Elegí jugadores y compará sus datos
+          con el jugador secreto.
+        </p>
+
+      </div>
+
+
+      <div class="legend">
+
+        <div class="legend-item">
+          <span class="legend-color green"></span>
+          <span>Dato correcto</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-color yellow"></span>
+          <span>Dato cercano</span>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-color gray"></span>
+          <span>Dato incorrecto</span>
+        </div>
+
+      </div>
+
+
+      <div class="example">
+
+        <span class="g">R</span>
+        <span class="y">I</span>
+        <span class="r">V</span>
+        <span class="r">E</span>
+        <span class="r">R</span>
+
+      </div>
+
+
+      <button
+        id="closeHelp"
+        class="modal-close"
+        type="button"
+      >
+        Entendido
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       JAVASCRIPT
+       ========================================= -->
+
+  <script type="module" src="./js/app.js"></script>
+
+</body>
+</html>

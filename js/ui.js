@@ -10,37 +10,41 @@ import {
 const elements = {};
 
 
+/* =========================================================
+   INIT UI
+   ========================================================= */
+
 /**
- * Inicializa referencias DOM.
+ * Inicializa referencias al DOM.
+ *
+ * Los elementos de otro juego pueden ser null.
+ * Esto es intencional porque ahora classic.html y
+ * who.html son páginas independientes.
  */
 export function initUI() {
 
+  /* -----------------------------------------
+     COMUNES
+     ----------------------------------------- */
+
   elements.message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
   elements.modeDescription =
     document.getElementById(
       "modeDescription"
     );
 
-  elements.classicMode =
-    document.getElementById(
-      "classicMode"
-    );
 
-  elements.whoMode =
-    document.getElementById(
-      "whoMode"
-    );
+  /* -----------------------------------------
+     CLÁSICO
+     ----------------------------------------- */
 
   elements.classicInput =
     document.getElementById(
       "classicInput"
-    );
-
-  elements.whoInput =
-    document.getElementById(
-      "whoInput"
     );
 
   elements.classicSuggestions =
@@ -48,19 +52,9 @@ export function initUI() {
       "classicSuggestions"
     );
 
-  elements.whoSuggestions =
-    document.getElementById(
-      "whoSuggestions"
-    );
-
   elements.classicBoard =
     document.getElementById(
       "classicBoard"
-    );
-
-  elements.whoRows =
-    document.getElementById(
-      "whoRows"
     );
 
   elements.classicKeyboard =
@@ -68,56 +62,124 @@ export function initUI() {
       "classicKeyboard"
     );
 
+
+  /* -----------------------------------------
+     ¿QUIÉN ES?
+     ----------------------------------------- */
+
+  elements.whoInput =
+    document.getElementById(
+      "whoInput"
+    );
+
+  elements.whoSuggestions =
+    document.getElementById(
+      "whoSuggestions"
+    );
+
+  elements.whoRows =
+    document.getElementById(
+      "whoRows"
+    );
+
+
+  /* -----------------------------------------
+     ESTADÍSTICAS
+     ----------------------------------------- */
+
   elements.streak =
-    document.getElementById("streak");
+    document.getElementById(
+      "streak"
+    );
 
   elements.played =
-    document.getElementById("played");
+    document.getElementById(
+      "played"
+    );
 
   elements.wins =
-    document.getElementById("wins");
-
-  elements.modeButtons =
-    [...document.querySelectorAll(
-      ".mode-button"
-    )];
+    document.getElementById(
+      "wins"
+    );
 
 }
 
 
+/* =========================================================
+   GET UI
+   ========================================================= */
+
 /**
- * Devuelve los elementos.
+ * Devuelve las referencias DOM.
  */
 export function getUI() {
+
   return elements;
+
 }
 
 
-/**
- * Cambia mensaje temporal.
- */
-export function toast(text, duration = 1800) {
+/* =========================================================
+   TOAST
+   ========================================================= */
 
-  elements.message.textContent = text;
+/**
+ * Muestra un mensaje temporal.
+ */
+export function toast(
+  text,
+  duration = 1800
+) {
+
+  if (!elements.message) {
+    console.warn(
+      "FUTBOLLE: #message no existe."
+    );
+    return;
+  }
+
+
+  elements.message.textContent =
+    text;
+
 
   clearTimeout(
     window.__futbolleToast
   );
 
+
   window.__futbolleToast =
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      elements.message.textContent = "";
+        if (elements.message) {
 
-    }, duration);
+          elements.message.textContent =
+            "";
+
+        }
+
+      },
+      duration
+    );
 
 }
 
 
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
 /**
- * Cambia descripción.
+ * Cambia la descripción del juego.
  */
-export function setDescription(text) {
+export function setDescription(
+  text
+) {
+
+  if (!elements.modeDescription) {
+    return;
+  }
 
   elements.modeDescription.textContent =
     text;
@@ -125,86 +187,96 @@ export function setDescription(text) {
 }
 
 
+/* =========================================================
+   STATS
+   ========================================================= */
+
 /**
- * Actualiza estadísticas.
+ * Actualiza estadísticas globales.
  */
-export function updateStats(statsView) {
+export function updateStats(
+  statsView
+) {
 
-  elements.played.textContent =
-    statsView.played;
+  if (
+    !statsView
+  ) {
+    return;
+  }
 
-  elements.streak.textContent =
-    statsView.streak;
 
-  elements.wins.textContent =
-    statsView.winRate;
+  if (elements.played) {
+
+    elements.played.textContent =
+      statsView.played;
+
+  }
+
+
+  if (elements.streak) {
+
+    elements.streak.textContent =
+      statsView.streak;
+
+  }
+
+
+  if (elements.wins) {
+
+    elements.wins.textContent =
+      statsView.winRate;
+
+  }
 
 }
 
 
-/**
- * Cambia el modo visual.
- */
-export function renderMode(mode) {
-
-  elements.modeButtons.forEach(
-    button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.mode === mode
-      );
-
-    }
-  );
-
-
-  elements.classicMode.classList.toggle(
-    "hidden",
-    mode !== "classic"
-  );
-
-  elements.whoMode.classList.toggle(
-    "hidden",
-    mode !== "who"
-  );
-
-
-  setDescription(
-    mode === "classic"
-      ? "Adiviná el apellido en 6 intentos."
-      : "Descubrí al jugador usando sus datos."
-  );
-
-}
-
+/* =========================================================
+   CLEAR INPUT
+   ========================================================= */
 
 /**
- * Limpia un input y autocomplete.
+ * Limpia un input y su autocomplete.
  */
 export function clearInput(
   input,
   suggestions
 ) {
 
-  input.value = "";
+  if (input) {
 
-  suggestions.innerHTML = "";
+    input.value =
+      "";
 
-  suggestions.style.display =
-    "none";
+  }
+
+
+  if (suggestions) {
+
+    suggestions.innerHTML =
+      "";
+
+    suggestions.style.display =
+      "none";
+
+  }
 
 }
 
 
+/* =========================================================
+   CREATE SUGGESTION
+   ========================================================= */
+
 /**
- * Crea una sugerencia.
+ * Crea una sugerencia de autocomplete.
+ *
  * @param {Object} options
  * @param {string} options.title
  * @param {string} options.subtitle
  * @param {Function} options.onClick
- * @param {boolean} [options.highlighted] - Marca la sugerencia como resaltada (navegación por teclado).
- * @param {number} [options.index] - Índice dentro de la lista, para id/scroll.
+ * @param {boolean} [options.highlighted]
+ * @param {number} [options.index]
  */
 export function createSuggestion(
   {
@@ -217,68 +289,124 @@ export function createSuggestion(
 ) {
 
   const item =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  item.className = highlighted
-    ? "suggestion highlighted"
-    : "suggestion";
+
+  item.className =
+    highlighted
+      ? "suggestion highlighted"
+      : "suggestion";
+
 
   item.setAttribute(
     "role",
     "option"
   );
 
+
   item.setAttribute(
     "aria-selected",
-    highlighted ? "true" : "false"
+    highlighted
+      ? "true"
+      : "false"
   );
 
-  if (index !== undefined) {
-    item.id = `suggestion-${index}`;
+
+  if (
+    index !== undefined
+  ) {
+
+    item.id =
+      `suggestion-${index}`;
+
   }
 
+
+  /* -----------------------------------------
+     CONTENIDO PRINCIPAL
+     ----------------------------------------- */
+
   const main =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   main.className =
     "suggestion-main";
 
 
   const strong =
-    document.createElement("strong");
+    document.createElement(
+      "strong"
+    );
 
   strong.textContent =
     displayValue(title);
 
 
   const small =
-    document.createElement("small");
+    document.createElement(
+      "small"
+    );
 
   small.textContent =
     displayValue(subtitle);
 
 
-  main.appendChild(strong);
-  main.appendChild(small);
+  main.appendChild(
+    strong
+  );
 
+  main.appendChild(
+    small
+  );
+
+
+  /* -----------------------------------------
+     FLECHA
+     ----------------------------------------- */
 
   const arrow =
-    document.createElement("span");
+    document.createElement(
+      "span"
+    );
 
   arrow.className =
     "suggestion-arrow";
 
-  arrow.textContent = "›";
+  arrow.textContent =
+    "›";
 
 
-  item.appendChild(main);
-  item.appendChild(arrow);
+  /* -----------------------------------------
+     ARMAR ELEMENTO
+     ----------------------------------------- */
 
-
-  item.addEventListener(
-    "click",
-    onClick
+  item.appendChild(
+    main
   );
+
+  item.appendChild(
+    arrow
+  );
+
+
+  /* -----------------------------------------
+     CLICK
+     ----------------------------------------- */
+
+  if (
+    typeof onClick === "function"
+  ) {
+
+    item.addEventListener(
+      "click",
+      onClick
+    );
+
+  }
 
 
   return item;
@@ -286,27 +414,58 @@ export function createSuggestion(
 }
 
 
+/* =========================================================
+   RENDER SUGGESTIONS
+   ========================================================= */
+
 /**
- * Muestra sugerencias.
+ * Renderiza sugerencias.
  */
 export function renderSuggestions(
   container,
   suggestions
 ) {
 
-  container.innerHTML = "";
+  if (!container) {
+    return;
+  }
 
-  suggestions.forEach(
-    suggestion =>
-      container.appendChild(
-        suggestion
-      )
-  );
+
+  container.innerHTML =
+    "";
+
+
+  if (
+    Array.isArray(suggestions)
+  ) {
+
+    suggestions.forEach(
+      suggestion => {
+
+        if (suggestion) {
+
+          container.appendChild(
+            suggestion
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  const hasSuggestions =
+    Array.isArray(suggestions) &&
+    suggestions.length > 0;
+
 
   container.style.display =
-    suggestions.length
+    hasSuggestions
       ? "block"
       : "none";
+
 
   container.setAttribute(
     "role",
